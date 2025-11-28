@@ -9,7 +9,6 @@ with open("./data-result.json","r") as f:
 
 
 # interpret location into a nested object by extracting the 5 parts of the location string  separated by /
-
 # Then organise the following operation status and temp into a nested object called data  with the keys status and temperature
 
 
@@ -36,11 +35,36 @@ def convertFromFormat1 (jsonObject):
 
     return result
 
+
+
+# parse timestamp from ISO 8601 to Unix timestamp and remap the fields to match the result.json
+# https://stackoverflow.com/questions/60442518/invalid-format-string-when-parsing-iso-8601-only-in-windows 
+
+
 def convertFromFormat2 (jsonObject):
+    
+    iso_timestamp = jsonObject['timestamp']
+    dt = datetime.datetime.fromisoformat(iso_timestamp.replace('Z', '+00:00'))
+    timestamp_ms = int(dt.timestamp() * 1000)
 
-    # IMPLEMENT: Conversion From Type 1
+    result = {
+        'deviceID': jsonObject['device']['id'],
+        'deviceType': jsonObject['device']['type'],
+        'timestamp': timestamp_ms,
+        'location': {
+            'country': jsonObject['country'],
+            'city': jsonObject['city'],
+            'area': jsonObject['area'],
+            'factory': jsonObject['factory'],
+            'section': jsonObject['section']
+        },
+        'data': {
+            'status': jsonObject['data']['status'],
+            'temperature': jsonObject['data']['temperature']
+        }
+    }
 
-    return NotImplemented
+    return result
 
 
 def main (jsonObject):
